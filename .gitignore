@@ -1,0 +1,9 @@
+# created by virtualenv automatically
+bin/
+lib/
+pyvenv.cfg
+*.pyc
+env/
+env
+venv/
+venv

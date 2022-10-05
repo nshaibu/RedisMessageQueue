@@ -1,0 +1,42 @@
+version: "3.9"
+services:
+  web_a:
+    build: ./getter
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - app_data:/getter
+      - media_a:/getter/media_a
+    ports:
+      - "8000:8000"
+    depends_on:
+      - redis
+  web_b:
+    build: ./setter
+    command: python manage.py runserver 0.0.0.0:8120
+    volumes:
+      - media_b:/setter/media_b
+    ports:
+      - "8120:8120"
+    depends_on:
+      - redis
+  worker_a:
+    build: ./getter
+    command: celery -A getter worker -l info -Q queue_1
+    volumes:
+      - app_data:/getter
+      - media_a:/getter/media_a
+    depends_on:
+      - redis
+  worker_b:
+    build: ./setter
+    volumes:
+      - media_b:/setter/media_b
+    command: celery -A setter worker -l info -Q queue_2
+    depends_on:
+      - redis
+  redis:
+    image: "redis:alpine"
+volumes:
+  media_a:
+  media_b:
+  app_data:
